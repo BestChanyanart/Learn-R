@@ -1,0 +1,139 @@
+---
+title: "Project_GapMinder"
+author: "Chanyanart KiattipornOpas"
+date: "7/27/2021"
+output: 
+    pdf_document: 
+      toc: yes
+      keep_tex: yes
+    html_document: 
+      toc: yes
+      toc_float: yes
+---
+
+### **1. Preview Data** 
+
+#### **1.1 Download Library**
+```{r download library, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gapminder)
+library(viridis)
+library(knitr)
+```
+<br>
+
+#### **1.2 Preview Data** 
+
+<mark>Table 1: Show Column and row of Gapminder dataset.</mark> <br>
+
+```{r Gapminder Dataset}
+gapminder
+glimpse(gapminder)
+```
+<br>
+<br>
+The GapMinder study show the development of each countries in many aspects, mainly Life Expectancy, population and GDP per Capita from 1952 to 1997. **There are 1,704 rows and 6 Columns** which contains data of Continent, Country, Year, Life Expectancy, population and GDP per Capita.  **1,704 rows are observations.**
+<br>
+<br>
+
+#### **1.3 To check Missing Value (NA) from Data set** 
+
+```{r Check Missing Value}
+sum(complete.cases(gapminder))   # 1,704 == rows
+
+check_na <- function(x) {
+   sum(is.na(x))
+}
+
+check_na(gapminder)              # 0
+```
+<br>
+All rows are completed and No Missing Value(NA) from this Gap Minder dataset. <br>
+
+
+#### **1.4 To check Observation**
+
+<mark>Table 2-3: To preview data (Year) and check Observation from Continent and Country column.</mark>
+
+```{r}
+gapminder %>% 
+    count(continent,country) 
+
+gapminder %>%
+   count(year)
+```
+<br>
+From the table clearly shows that the data was collected 12 times every 5 years from 1952 - 2007, broken down in 5 continents with 142 countries. All countries have the same size of dataset (12 years) <br>
+<br>
+
+<mark>Table 4: Show number of data from Countries in each continents and percentages.</mark>
+
+Country and Continent are factor. Let's count how many country in each continent from this Data?
+
+
+```{r message=FALSE, warning=FALSE}
+sample_size <- gapminder %>%
+        group_by(continent) %>%
+        summarise(
+        n = n(),
+        n_country = n_distinct(country),
+        pct_country = (n_country / 142)*100) 
+sample_size 
+```
+
+```{r Preview Country sample, message=FALSE, warning=FALSE}
+sample_size %>% 
+  ggplot(aes(continent, n_country, 
+             fill = continent)) + 
+  geom_col() + 
+  theme_minimal() + 
+  scale_fill_viridis(discrete = TRUE, 
+                       direction = -1) + 
+  labs(title = "Hom many countries in each continent?", 
+       x = "Continent", 
+       y = "Country", 
+       caption = "Source: Gapminder Dataframe")
+
+```
+
+According to bar chart, data was taken from 5 continents, but it is quite clear that the largest data are from Africa (52 countries). Asia and Europe continents quite close (33 and 30 countries respectively.) Americas only have 25 countries. The smallest continents is Oceania (2 countries). <br>
+
+### **2. Question**
+
+#### **2.1 Which Continent has highest and lowest GDP and Life Expectancy in 2007?** <br>
+
+
+<br> <mark>(Table 5-6) The average of GDP per capital, Life Expectancy and Population grouped by Continent (Year 2007). </mark>
+
+```{r message=FALSE, warning=FALSE}
+gapminder %>% 
+  filter(year == 2007) %>%
+  group_by(continent) %>% 
+  summarise(
+    avg_gdp = mean(gdpPercap),
+    sd_gdp =  sd(gdpPercap),
+    min_gdp = min(gdpPercap), 
+    max_gdp = max(gdpPercap),
+    n_country = n() ) %>% 
+  arrange(desc(avg_gdp))
+```
+
+```{r message=FALSE, warning=FALSE}
+gapminder %>% 
+  filter(year == 2007) %>%
+  group_by(continent) %>% 
+  summarise(
+    avg_lifeExp = mean(lifeExp),
+    sd_lifeExp = sd(lifeExp),
+    min_lifeExp = min(lifeExp), 
+    max_lifeExp = max(lifeExp),
+    n_country = n())  %>% 
+  arrange(desc(avg_lifeExp))
+```
+
+
+
+
+
+
+
